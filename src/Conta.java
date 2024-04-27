@@ -1,25 +1,47 @@
-public class Conta {
-    private int saldo;
+import java.util.concurrent.locks.ReentrantLock;
 
-    public Conta(int saldoInicial) {
+public class Conta {
+    private double saldo;
+    private final ReentrantLock lock = new ReentrantLock();
+
+    public Conta(double saldoInicial) {
         this.saldo = saldoInicial;
     }
 
-    public synchronized void depositar(int valor) {
-        saldo += valor;
-        System.out.println(Thread.currentThread().getName() + " depositou " + valor + "; Saldo agora é: " + saldo);
-    }
-
-    public synchronized boolean sacar(int valor) {
-        if (saldo >= valor) {
-            saldo -= valor;
-            System.out.println(Thread.currentThread().getName() + " sacou " + valor + "; Saldo restante: " + saldo);
-            return true;
+    public void depositar(double valor) {
+        lock.lock();
+        try {
+            saldo += valor;
+            System.out.println("Depósito realizado: " + valor + ". Saldo atual: " + saldo);
+        } finally {
+            lock.unlock();
         }
-        return false;
     }
 
-    public int getSaldo() {
-        return saldo;
+    public boolean retirar(double valor) {
+        lock.lock();
+        try {
+            if (saldo >= valor) {
+                saldo -= valor;
+                System.out.println("Retirada realizada: " + valor + ". Saldo atual: " + saldo);
+                return true;
+            } else {
+                System.out.println("Falha na retirada: Saldo insuficiente.");
+                return false;
+            }
+        } finally {
+            lock.unlock();
+        }
     }
+
+    public double getSaldo() {
+        lock.lock();
+        try {
+            return saldo;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+
 }

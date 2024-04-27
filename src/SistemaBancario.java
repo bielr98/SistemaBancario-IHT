@@ -1,42 +1,73 @@
 public class SistemaBancario {
     public static void main(String[] args) {
-//        1 Banco
+        // Criar o banco
         Banco banco = new Banco();
 
-//        2 Lojas
-        Loja loja1 = new Loja("Loja 1", 5000);
-        Loja loja2 = new Loja("Loja 2", 5000);
+        // Criar as contas das lojas
+        Conta contaLoja1 = new Conta(0);
+        Conta contaLoja2 = new Conta(0);
 
-        Loja[] lojas = {loja1, loja2};
+        // Criar as lojas
+        Loja loja1 = new Loja(banco, contaLoja1);
+        Loja loja2 = new Loja(banco, contaLoja2);
 
-//        4 Funcionarios;
-        Funcionario f1 = new Funcionario(banco, "Func Loja 1 - 1");
-        Funcionario f2 = new Funcionario(banco, "Func Loja 1 - 2");
-        Funcionario f3 = new Funcionario(banco, "Func Loja 2 - 1");
-        Funcionario f4 = new Funcionario(banco, "Func Loja 2 - 2");
+        // Criar e adicionar funcionários às lojas
+        Funcionario func1 = new Funcionario(banco);
+        Funcionario func2 = new Funcionario(banco);
+        Funcionario func3 = new Funcionario(banco);
+        Funcionario func4 = new Funcionario(banco);
 
-//        2 funcionarios por loja
-        loja1.contratarFuncionario(f1);
-        loja1.contratarFuncionario(f2);
-        loja2.contratarFuncionario(f3);
-        loja2.contratarFuncionario(f4);
+        loja1.adicionarFuncionario(func1, 0);
+        loja1.adicionarFuncionario(func2, 1);
+        loja2.adicionarFuncionario(func3, 0);
+        loja2.adicionarFuncionario(func4, 1);
 
-//        5 Clientes
-        Cliente c1 = new Cliente(banco, 1000, lojas, "Cliente 1");
-        Cliente c2 = new Cliente(banco, 1000, lojas, "Cliente 2");
-        Cliente c3 = new Cliente(banco, 1000, lojas, "Cliente 3");
-        Cliente c4 = new Cliente(banco, 1000, lojas, "Cliente 4");
-        Cliente c5 = new Cliente(banco, 1000, lojas, "Cliente 5");
+        // Criar as contas dos clientes
+        Cliente[] clientes = new Cliente[5];
+        for (int i = 0; i < clientes.length; i++) {
+            clientes[i] = new Cliente(new Conta(1400), banco, loja1, loja2);
+        }
 
-        c1.start();
-        c2.start();
-        c3.start();
-        c4.start();
-        c5.start();
+        // Iniciar as threads dos clientes
+        for (Cliente cliente : clientes) {
+            cliente.start();
+        }
 
-        f1.start();
-        f2.start();
-        f3.start();
-        f4.start();
+        // Iniciar as threads dos funcionários
+        func1.start();
+        func2.start();
+        func3.start();
+        func4.start();
+
+        // Esperar os clientes terminarem suas compras
+        for (Cliente cliente : clientes) {
+            try {
+                cliente.join();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+
+        // Realizar pagamento dos funcionários
+        loja1.pagarFuncionarios();
+        loja2.pagarFuncionarios();
+
+        // Esperar os funcionários terminarem suas operações
+        try {
+            func1.join();
+            func2.join();
+            func3.join();
+            func4.join();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        // Relatório final dos saldos
+        System.out.println("Saldo final conta Loja 1: " + contaLoja1.getSaldo());
+        System.out.println("Saldo final conta Loja 2: " + contaLoja2.getSaldo());
+        System.out.println("Saldo final dos clientes:");
+        for (int i = 0; i < clientes.length; i++) {
+            System.out.println("Cliente " + (i + 1) + ": " + clientes[i].getSaldoConta());
+        }
     }
 }
