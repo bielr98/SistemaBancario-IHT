@@ -1,6 +1,5 @@
+# Iteração Humano Computador AT2/N1 - Atividade prática individual - Bimestre N1
 # Sistema Bancário com Threads em Java
-- Iteração Humano Computador AT2/N1 - Atividade prática individual - Bimestre N1
-
 Este projeto implementa um sistema bancário simulado utilizando Java e conceitos de programação concorrente com threads. O sistema garante a sincronização de transações e a consistência de saldos através de uma implementação cuidadosa usando o objeto `Banco`.
 
 ## Entidades do Sistema
